@@ -14,7 +14,7 @@ import numpy as np
 import pandas as pd
 
 from common_scripts.config import REPO_ROOT, load_config, general_path, layer_path
-from report.docx_writer import Document
+from report.docx_writer import Document, rich
 
 REPORT_DIR = REPO_ROOT / "report"
 OUT = REPORT_DIR.joinpath("DVD_ML_Leakage_Report.docx")
@@ -78,19 +78,28 @@ def main() -> None:
     d.title_block("ML-Driven PVT Variation-Aware Leakage Estimation", [
         "Digital VLSI Design: Course Project Report",
         "Team **Watt the leak**",
-        "Technology: PTM **32 nm Low Power** (BSIM4)  |  VDD = **0.9 V**  |  Test circuit: **3-bit CLA**",
-        f"Simulator: **{ngspice_ver}**  |  Python {setup['python']}  |  scikit-learn {pkgs['sklearn']}",
     ])
-    d._p("", extra_ppr='<w:spacing w:before="600" w:after="0"/>')
+    d._p("", extra_ppr='<w:spacing w:before="240" w:after="0"/>')
+    d.table(["Team member", "Roll number"], [
+        ["Phalgun", "2026702011"],
+        ["M L Venkat", "2026702012"],
+        ["Naveen", "2026702001"],
+        ["Krishna", "2026702010"],
+    ], widths=[3.0, 2.0])
+    d._p(rich("GitHub: **https://github.com/phalgun18/ml-pvt-leakage-estimation**", size=22, color="404040"),
+         jc="center", extra_ppr='<w:spacing w:before="200" w:after="60"/>')
+    d._p(rich("Technology: PTM **32 nm Low Power** (BSIM4)  |  VDD = **0.9 V**  |  Test circuit: **3-bit CLA**",
+              size=22, color="404040"), jc="center", extra_ppr='<w:spacing w:before="60" w:after="60"/>')
+    d._p(rich(f"Simulator: **{ngspice_ver}**  |  Python {setup['python']}  |  scikit-learn {pkgs['sklearn']}",
+              size=22, color="404040"), jc="center", extra_ppr='<w:spacing w:before="60" w:after="60"/>')
+    d._p("", extra_ppr='<w:spacing w:before="360" w:after="0"/>')
     d.table(["Result", "Median error", "P95 error", "Mean accuracy"], [
         ["Part A: transistor models (test set, all terminals)", f"{t_ok.median_err_pct.median():.2f} %",
          f"{t_ok.p95_err_pct.median():.2f} %", f"**{acc_a:.2f} %**"],
         ["Part B: gates (3,600 simulations)", f"{g_all.median_err_pct:.2f} %", f"{g_all.p95_err_pct:.2f} %",
          f"**{100 - g_all.mean_err_pct:.2f} %**"],
-        ["Part C: 3-bit CLA, spec method (12,800 sims)", f"{ctab.iloc[0].median_err_pct:.2f} %",
-         f"{ctab.iloc[0].p95_err_pct:.2f} %", f"**{acc_spec:.2f} %**"],
-        ["Part C: 3-bit CLA, + loading gate tunnelling", f"{ctab.iloc[3].median_err_pct:.2f} %",
-         f"{ctab.iloc[3].p95_err_pct:.2f} %", f"**{acc_load:.2f} %**"],
+        ["Part C: 3-bit CLA (12,800 simulations, with loading gate tunnelling)",
+         f"{ctab.iloc[3].median_err_pct:.2f} %", f"{ctab.iloc[3].p95_err_pct:.2f} %", f"**{acc_load:.2f} %**"],
     ], widths=[3.4, 1.1, 1.1, 1.2], caption="Headline results (mean accuracy = 100 % − mean relative error).")
     d.page_break()
     d.toc()

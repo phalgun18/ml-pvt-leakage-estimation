@@ -76,6 +76,9 @@ def _png_size(path: Path) -> tuple[int, int]:
     return struct.unpack(">II", head[16:24])
 
 
+TOC_ENTRIES = "<!--TOC_ENTRIES-->"
+
+
 class Document:
     def __init__(self, title: str, author: str = ""):
         self.title, self.author = title, author
@@ -84,6 +87,7 @@ class Document:
         self.fig_no = 0
         self.tab_no = 0
         self._pid = 0
+        self.headings: list[tuple[int, str, str]] = []   # (level, text, bookmark) for the TOC
 
     # ---------- blocks ----------
     def _p(self, inner: str, style: str | None = None, jc: str | None = None, extra_ppr: str = "") -> None:
@@ -102,7 +106,11 @@ class Document:
             self._p(rich(line, size=26, color="404040"), jc="center", extra_ppr='<w:spacing w:before="60" w:after="60"/>')
 
     def heading(self, text: str, level: int = 1) -> None:
-        self._p(_run(text), style=f"Heading{level}")
+        bm = f"_Toc{len(self.headings) + 1:04d}"
+        self.headings.append((level, text, bm))
+        n = len(self.headings)
+        self._p(f'<w:bookmarkStart w:id="{n}" w:name="{bm}"/>{_run(text)}<w:bookmarkEnd w:id="{n}"/>',
+                style=f"Heading{level}")
 
     def para(self, text: str, jc: str | None = "both") -> None:
         self._p(rich(text), jc=jc)
@@ -129,9 +137,24 @@ class Document:
             '<w:p><w:r><w:fldChar w:fldCharType="begin" w:dirty="true"/></w:r>'
             '<w:r><w:instrText xml:space="preserve"> TOC \\o "1-2" \\h \\z \\u </w:instrText></w:r>'
             '<w:r><w:fldChar w:fldCharType="separate"/></w:r>'
-            + _run("Right-click here and choose 'Update Field' (or press F9) to build the table of contents.",
-                   italic=True, color="7F7F7F")
-            + '<w:r><w:fldChar w:fldCharType="end"/></w:r></w:p>')
+            + '</w:p>' + TOC_ENTRIES + '<w:p><w:r><w:fldChar w:fldCharType="end"/></w:r></w:p>')
+
+    def _toc_entries(self) -> str:
+        """Pre-filled TOC lines (levels 1-2) so the contents show without pressing F9.
+        Each line links to its heading; page numbers are PAGEREF fields Word fills on open."""
+        out = []
+        for level, text, bm in self.headings:
+            if level > 2:
+                continue
+            out.append(
+                f'<w:p><w:pPr><w:pStyle w:val="TOC{level}"/></w:pPr>'
+                f'<w:hyperlink w:anchor="{bm}" w:history="1">{_run(text)}'
+                '<w:r><w:tab/></w:r>'
+                '<w:r><w:fldChar w:fldCharType="begin"/></w:r>'
+                f'<w:r><w:instrText xml:space="preserve"> PAGEREF {bm} \h </w:instrText></w:r>'
+                '<w:r><w:fldChar w:fldCharType="separate"/></w:r><w:r><w:t></w:t></w:r>'
+                '<w:r><w:fldChar w:fldCharType="end"/></w:r></w:hyperlink></w:p>')
+        return "".join(out)
 
     def figure(self, path: Path, caption: str, width_frac: float = 1.0) -> None:
         path = Path(path)
@@ -212,7 +235,7 @@ class Document:
                 '<w:pgMar w:top="1247" w:right="1440" w:bottom="1247" w:left="1440" w:header="708" '
                 'w:footer="567" w:gutter="0"/></w:sectPr>')
         document = (f'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document {NS}><w:body>'
-                    + "".join(self.body) + sect + "</w:body></w:document>")
+                    + "".join(self.body).replace(TOC_ENTRIES, self._toc_entries()) + sect + "</w:body></w:document>")
         rels = ['<Relationship Id="rIdStyles" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>',
                 '<Relationship Id="rIdNum" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/numbering" Target="numbering.xml"/>',
                 '<Relationship Id="rIdSettings" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>',
@@ -301,9 +324,9 @@ STYLES = (
     '<w:pPr><w:spacing w:before="240" w:after="120"/></w:pPr>'
     f'<w:rPr><w:b/><w:color w:val="{ACCENT}"/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr></w:style>'
     '<w:style w:type="paragraph" w:styleId="TOC1"><w:name w:val="toc 1"/><w:basedOn w:val="Normal"/>'
-    '<w:pPr><w:spacing w:before="60" w:after="20"/></w:pPr><w:rPr><w:b/></w:rPr></w:style>'
+    '<w:pPr><w:tabs><w:tab w:val="right" w:leader="dot" w:pos="9020"/></w:tabs><w:spacing w:before="60" w:after="20"/></w:pPr><w:rPr><w:b/></w:rPr></w:style>'
     '<w:style w:type="paragraph" w:styleId="TOC2"><w:name w:val="toc 2"/><w:basedOn w:val="Normal"/>'
-    '<w:pPr><w:spacing w:before="0" w:after="20"/><w:ind w:left="220"/></w:pPr></w:style>'
+    '<w:pPr><w:tabs><w:tab w:val="right" w:leader="dot" w:pos="9020"/></w:tabs><w:spacing w:before="0" w:after="20"/><w:ind w:left="220"/></w:pPr></w:style>'
     '<w:style w:type="paragraph" w:styleId="Caption"><w:name w:val="caption"/><w:basedOn w:val="Normal"/><w:qFormat/>'
     '<w:pPr><w:spacing w:before="40" w:after="200"/><w:jc w:val="center"/></w:pPr>'
     '<w:rPr><w:i/><w:color w:val="404040"/><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr></w:style>'

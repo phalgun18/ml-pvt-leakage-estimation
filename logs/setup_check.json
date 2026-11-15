@@ -1,0 +1,107 @@
+{
+  "time": "2026-11-15T23:25:07",
+  "python": "3.11.9",
+  "platform": "Windows-10-10.0.26200-SP0",
+  "checks": {
+    "python_packages": {
+      "status": "PASS",
+      "detail": {
+        "numpy": "2.4.6",
+        "pandas": "3.1.0",
+        "matplotlib": "3.11.1",
+        "sklearn": "1.9.1",
+        "scipy": "1.17.1",
+        "joblib": "1.6.0"
+      }
+    },
+    "ngspice": {
+      "status": "PASS",
+      "detail": {
+        "path": "C:\\ngspice\\Spice64\\bin\\ngspice_con.exe",
+        "version": "ngspice-46"
+      }
+    },
+    "model_card_nominals": {
+      "status": "PASS",
+      "detail": {
+        "nmos": {
+          "vth0": 0.63,
+          "toxe": 1.6e-09,
+          "ndep": 4.12e+18,
+          "u0": 0.042,
+          "xj": 5e-08
+        },
+        "pmos": {
+          "vth0": -0.5808,
+          "toxe": 1.62e-09,
+          "ndep": 3.07e+18,
+          "u0": 0.016,
+          "xj": 1e-08
+        }
+      }
+    },
+    "model_card_patch": {
+      "status": "PASS",
+      "detail": {
+        "patched_values": {
+          "nmos": {
+            "vth0": 0.693,
+            "toxe": 1.76e-09,
+            "ndep": 4.532e+18,
+            "u0": 0.0462,
+            "xj": 5.5e-08
+          },
+          "pmos": {
+            "vth0": -0.63888,
+            "toxe": 1.782e-09,
+            "ndep": 3.377e+18,
+            "u0": 0.0176,
+            "xj": 1.1e-08
+          }
+        },
+        "pmos_unchanged_when_only_nmos_patched": true
+      }
+    },
+    "sim_nmos_on": {
+      "status": "PASS",
+      "detail": {
+        "id": "2.166770e-05",
+        "ig": "9.664713e-12",
+        "is": "-2.166771e-05",
+        "ib": "-6.820757e-14",
+        "kcl_sum": "2.751916e-16"
+      }
+    },
+    "sim_nmos_off": {
+      "status": "PASS",
+      "detail": {
+        "id": "1.451596e-12",
+        "ig": "-7.438372e-33",
+        "is": "-1.441596e-12",
+        "ib": "-1.000090e-14",
+        "kcl_sum": "2.704215e-27"
+      }
+    },
+    "sim_pmos_on": {
+      "status": "PASS",
+      "detail": {
+        "id": "-1.265184e-05",
+        "ig": "-3.688589e-12",
+        "is": "1.265184e-05",
+        "ib": "4.535261e-14",
+        "kcl_sum": "-4.040347e-17"
+      }
+    },
+    "sim_pmos_off": {
+      "status": "PASS",
+      "detail": {
+        "id": "-1.222445e-12",
+        "ig": "4.440892e-16",
+        "is": "1.212444e-12",
+        "ib": "9.992007e-15",
+        "kcl_sum": "4.351925e-16"
+      }
+    }
+  },
+  "overall": "PASS"
+}
