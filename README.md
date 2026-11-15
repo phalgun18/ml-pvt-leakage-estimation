@@ -7,7 +7,7 @@ variation with ML models of single transistors instead of full SPICE runs. We
 then validate them hierarchically: transistor → gate → 3-bit CLA.
 
 > **Status:** Parts A, B and C complete. Technical report:
-> [report/DVD_ML_Leakage_Report.docx](report/DVD_ML_Leakage_Report.docx). File-by-file guide: [report/File_Guide.pdf](report/File_Guide.pdf).
+> [report/DVD_ML_Leakage_Report.docx](report/DVD_ML_Leakage_Report.docx).
 
 ## 1. Assignment
 
