@@ -1,0 +1,60 @@
+[nmos_on] split: {'train': 7000, 'test': 1500, 'val': 1500}
+[nmos_off] split: {'train': 7000, 'test': 1500, 'val': 1500}
+[pmos_on] split: {'train': 7000, 'test': 1500, 'val': 1500}
+[pmos_off] split: {'train': 7000, 'test': 1500, 'val': 1500}
+fitting 112 regressors with 10 jobs ...
+[Parallel(n_jobs=10)]: Using backend LokyBackend with 10 concurrent workers.
+[Parallel(n_jobs=10)]: Done  52 out of 112 | elapsed:  5.4min
+[Parallel(n_jobs=10)]: Done 112 out of 112 | elapsed: 14.1min finished
+done in 845s
+
+VALIDATION (mean over terminals with |I| >= 1e-15 A)
+     case      model  R2_log10_mean  median_err_pct_mean  p95_err_pct_mean  p95_err_pct_worst  fit_time_s
+nmos_off        hgb         0.9958                1.888             18.48              27.58       158.7
+nmos_off        mlp         0.9999               0.3069             3.038              4.357        1532
+nmos_off poly_ridge         0.9996               0.3725             6.498              11.24       168.1
+nmos_off         rf           0.99                2.455             31.85              49.73       201.2
+ nmos_on        hgb         0.9989                4.459             20.47              28.52         140
+ nmos_on        mlp         0.9998                1.065             4.106              6.859        1464
+ nmos_on poly_ridge         0.9963                8.296             29.52              50.11         137
+ nmos_on         rf         0.9977                9.004             41.71              63.18       169.3
+pmos_off        hgb         0.9927                1.938             16.97              26.21       173.4
+pmos_off        mlp         0.9999               0.4126             2.654              3.718        1280
+pmos_off poly_ridge         0.9994               0.5129             6.449              11.79         154
+pmos_off         rf         0.9898                2.273              32.8              51.59       198.3
+ pmos_on        hgb         0.9991                4.328             21.17              29.07       123.4
+ pmos_on        mlp         0.9997                1.071             4.817              6.847        1327
+ pmos_on poly_ridge         0.9946                9.756             32.68              60.49       166.4
+ pmos_on         rf         0.9975                8.759             38.87              55.91       197.5
+[nmos_on] selected: hybrid[ich:mlp,jd:mlp,js:mlp,igc:mlp,igc_share:mlp,igb:mlp,isub:mlp]
+[nmos_off] selected: hybrid[ich:poly_ridge,jd:hgb,js:mlp,igc:mlp,igc_share:mlp,igb:mlp,isub:poly_ridge]
+[pmos_on] selected: hybrid[ich:mlp,jd:mlp,js:mlp,igc:mlp,igc_share:mlp,igb:mlp,isub:mlp]
+[pmos_off] selected: hybrid[ich:poly_ridge,jd:mlp,js:mlp,igc:mlp,igc_share:mlp,igb:mlp,isub:poly_ridge]
+
+VALIDATION, selected per-component model
+           r2_log10  median_err_pct  p95_err_pct
+case                                           
+nmos_off         1          0.1461        1.501
+nmos_on     0.9998           1.065        4.106
+pmos_off    0.9999          0.2474        1.587
+pmos_on     0.9997           1.071        4.817
+
+TEST (chosen models)
+     case                                                                              model terminal  n_used  n_below_floor  r2_log10  median_err_pct  p95_err_pct   bias_pct  sign_errors
+ nmos_on               hybrid[ich:mlp,jd:mlp,js:mlp,igc:mlp,igc_share:mlp,igb:mlp,isub:mlp]       id    1500              0         1          0.8353        3.087   -0.05668            0
+ nmos_on               hybrid[ich:mlp,jd:mlp,js:mlp,igc:mlp,igc_share:mlp,igb:mlp,isub:mlp]       ig    1103            397    0.9997           2.353        7.376      1.433            0
+ nmos_on               hybrid[ich:mlp,jd:mlp,js:mlp,igc:mlp,igc_share:mlp,igb:mlp,isub:mlp]       is    1495              5         1          0.8386        3.094    -0.0556            0
+ nmos_on               hybrid[ich:mlp,jd:mlp,js:mlp,igc:mlp,igc_share:mlp,igb:mlp,isub:mlp]       ib    1500              0    0.9998          0.2858        3.077    0.01896            0
+nmos_off hybrid[ich:poly_ridge,jd:hgb,js:mlp,igc:mlp,igc_share:mlp,igb:mlp,isub:poly_ridge]       id    1492              8         1        0.001817       0.7204 -6.843e-06            0
+nmos_off hybrid[ich:poly_ridge,jd:hgb,js:mlp,igc:mlp,igc_share:mlp,igb:mlp,isub:poly_ridge]       ig       0           1500       NaN             NaN          NaN        NaN            0
+nmos_off hybrid[ich:poly_ridge,jd:hgb,js:mlp,igc:mlp,igc_share:mlp,igb:mlp,isub:poly_ridge]       is     893            607         1          0.4469        2.379     0.1446            0
+nmos_off hybrid[ich:poly_ridge,jd:hgb,js:mlp,igc:mlp,igc_share:mlp,igb:mlp,isub:poly_ridge]       ib    1498              2         1        0.006596        1.657 -6.254e-06            0
+ pmos_on               hybrid[ich:mlp,jd:mlp,js:mlp,igc:mlp,igc_share:mlp,igb:mlp,isub:mlp]       id    1498              2         1           1.135        3.911    -0.1503            0
+ pmos_on               hybrid[ich:mlp,jd:mlp,js:mlp,igc:mlp,igc_share:mlp,igb:mlp,isub:mlp]       ig    1137            363    0.9999           1.521        4.427      1.127            0
+ pmos_on               hybrid[ich:mlp,jd:mlp,js:mlp,igc:mlp,igc_share:mlp,igb:mlp,isub:mlp]       is    1493              7         1           1.135        3.988    -0.1505            0
+ pmos_on               hybrid[ich:mlp,jd:mlp,js:mlp,igc:mlp,igc_share:mlp,igb:mlp,isub:mlp]       ib    1500              0    0.9994          0.4514        7.071     0.1048            0
+pmos_off hybrid[ich:poly_ridge,jd:mlp,js:mlp,igc:mlp,igc_share:mlp,igb:mlp,isub:poly_ridge]       id    1493              7         1        0.001088        0.431 -1.303e-06            0
+pmos_off hybrid[ich:poly_ridge,jd:mlp,js:mlp,igc:mlp,igc_share:mlp,igb:mlp,isub:poly_ridge]       ig       0           1500       NaN             NaN          NaN        NaN            0
+pmos_off hybrid[ich:poly_ridge,jd:mlp,js:mlp,igc:mlp,igc_share:mlp,igb:mlp,isub:poly_ridge]       is     875            625         1          0.3862        2.849   -0.01566            0
+pmos_off hybrid[ich:poly_ridge,jd:mlp,js:mlp,igc:mlp,igc_share:mlp,igb:mlp,isub:poly_ridge]       ib    1496              4         1          0.3626        1.967    0.09635            0
+plots -> C:\Users\HP\OneDrive\Desktop\ml-pvt-leakage-estimation\DVD_ML_Leakage_Project\outputs\part_a
