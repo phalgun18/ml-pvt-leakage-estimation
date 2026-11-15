@@ -7,4 +7,4 @@ scipy==1.17.1
 joblib==1.6.0
 # External (not pip): ngspice-46, path set in config/project_config.json
 
-# Report only (src/report): the .docx is written with the Python standard library, no extra packages.
+
