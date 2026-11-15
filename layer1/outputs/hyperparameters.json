@@ -1,6 +1,0 @@
-{
-  "poly_ridge": "StandardScaler -> PolynomialFeatures(degree=3) -> RidgeCV(alpha in 1e-6..1e2)",
-  "rf": "400 trees, max_features=0.6, min_samples_leaf=1",
-  "hgb": "max_iter=3000, lr=0.05, max_leaf_nodes=31, min_samples_leaf=10, l2=1e-3, early stop (100)",
-  "mlp": "average of 3 seeds of: 3x128 tanh, adam lr=1e-3, batch 128, alpha=1e-6, early stop (60), standardised X and y"
-}
