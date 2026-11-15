@@ -1,0 +1,70 @@
+{
+  "project": {
+    "title": "ML-Driven PVT Variation Aware Leakage Estimation",
+    "team": "Watt the leak",
+    "technology": "32nm_LP (PTM Low Power 32nm, BSIM4 level 54)"
+  },
+
+  "paths": {
+    "ngspice": "C:/ngspice/Spice64/bin/ngspice_con.exe",
+    "model_card": "32nm_LP.pm",
+    "tmp_dir": "tmp",
+    "logs_dir": "logs"
+  },
+
+  "technology": {
+    "vdd_nominal": 0.9,
+    "vdd_tolerance": 0.10,
+    "lmin": 32e-9,
+    "w_min_mult": 1,
+    "w_max_mult": 8,
+    "temp_min_c": -40.0,
+    "temp_max_c": 125.0,
+    "process_tolerance": 0.10,
+    "process_params": ["vth0", "toxe", "ndep", "u0", "xj"],
+    "model_names": {"nmos": "nmos", "pmos": "pmos"},
+    "expected_nominals": {
+      "nmos": {"vth0": 0.63,    "toxe": 1.6e-9,  "ndep": 4.12e18, "u0": 0.042, "xj": 5e-8},
+      "pmos": {"vth0": -0.5808, "toxe": 1.62e-9, "ndep": 3.07e18, "u0": 0.016, "xj": 1e-8}
+    }
+  },
+
+  "spice": {
+    "options_line": ".options gmin=1e-18 abstol=1e-18 reltol=1e-6 vntol=1e-9",
+    "print_digits": 15,
+    "circuit_convergence_line": ".options itl1=1000 itl6=1000 pivrel=0.5",
+    "timeout_s": 60,
+    "workers": 12
+  },
+
+  "part_a": {
+    "cases": {
+      "nmos_on":  {"device": "nmos", "vg": "vdd", "vb": "0"},
+      "nmos_off": {"device": "nmos", "vg": "0",   "vb": "0"},
+      "pmos_on":  {"device": "pmos", "vg": "0",   "vb": "vdd"},
+      "pmos_off": {"device": "pmos", "vg": "vdd", "vb": "vdd"}
+    },
+    "n_samples": 10000,
+    "sample_seed": 20261115,
+    "split_fractions": [0.70, 0.15, 0.15],
+    "split_seed": 42
+  },
+
+  "part_b": {
+    "n_corners": 200,
+    "corner_seed": 31415,
+    "gates": ["inv", "nand2", "nor2", "and2", "or2"]
+  },
+
+  "part_c": {
+    "circuit": "cla3",
+    "n_bits": 3,
+    "cin": 0
+  },
+
+  "metrics": {
+    "current_floor_a": 1e-18,
+    "kcl_abs_tol_a": 1e-15,
+    "kcl_rel_tol": 1e-6
+  }
+}

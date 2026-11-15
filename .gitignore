@@ -1,2 +1,5 @@
-
+__pycache__/
+*.py[cod]
+.venv/
+venv/
 layer3/data/raw/part_c_spice.csv
