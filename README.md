@@ -2,8 +2,8 @@
 
 Digital VLSI Design course project. Team **Watt the leak**.
 
-Full technical report: [report/DVD_ML_Leakage_Report.docx](report/DVD_ML_Leakage_Report.docx).
-File-by-file guide: [report/File_Guide.pdf](report/File_Guide.pdf).
+Full technical report: [report/DVD_ML_Leakage_Report.docx](report/DVD_ML_Leakage_Report.pdf).
+
 
 ---
 
