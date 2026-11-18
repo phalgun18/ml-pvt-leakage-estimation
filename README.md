@@ -111,6 +111,29 @@ rule that holds on 100 % of samples. The terminal currents are rebuilt by KCL-co
 sums. Four model types (polynomial ridge, random forest, HGB, MLP) are compared, and the
 best is chosen **per component** on the validation set.
 
+The four terminal currents are rebuilt from the predicted components
+([transistor_model.py](common_scripts/transistor_model.py), `compose_terminals`). All currents are
+positive *into* the terminal. For an NMOS in forward mode (Vd ≥ Vs):
+
+```
+id =  ich + jd + isub − igcd
+is = −ich + js − igcs
+ig =  igcs + igcd + igb
+ib = −jd − js − isub − igb
+```
+
+| Symbol | Component |
+|---|---|
+| ich | channel current, drain → source (subthreshold when OFF) |
+| jd, js | drain–body and source–body junction diodes |
+| isub | impact-ionisation substrate current |
+| igcs, igcd | gate-to-channel tunnelling, source and drain shares (igcs + igcd = Igc) |
+| igb | gate-to-body tunnelling |
+
+The sum id + is + ig + ib = 0, so KCL holds by construction. In reverse mode (Vd < Vs) the drain
+and source roles swap: id = −ich + jd − igcs and is = ich + js + isub − igcd. For PMOS the same
+equations are evaluated on sign-flipped voltages, and all four currents are multiplied by −1.
+
 Gate-to-channel tunnelling (Igc) is trained without drain-referenced features, following
 BSIM4's own structure. Its drain/source split is a separate model that is exactly ½ at
 Vds = 0. This change cut gate-level mean error from 5.2 % to 1.4 %.
@@ -124,6 +147,23 @@ predicted, because their |Vds| ~ 1e-7 V is outside the training data.
 We ran 64 vectors × 200 corners = 12,800 full-netlist SPICE runs. The **spec method** logic-simulates
 the adder and sums each gate's Part-B ML leakage. The **loading-aware** method also adds
 the ML gate-input current of every gate input held high by another gate.
+
+Carry equations and the gates that build them ([cla.py](common_scripts/cla.py)). Carry-in c0 is
+tied to 0. Each XOR is 4 × NAND2: n1 = NAND(x, y), n2 = NAND(x, n1), n3 = NAND(y, n1),
+out = NAND(n2, n3).
+
+| Signal | Logic | Instances | Gates |
+|---|---|---|---|
+| g<sub>i</sub> | a<sub>i</sub> · b<sub>i</sub> | gen0–2 | 3 AND2 |
+| p<sub>i</sub> | a<sub>i</sub> ⊕ b<sub>i</sub> | xp0–2 | 3 XOR = 12 NAND2 |
+| c<sub>1</sub> | g<sub>0</sub> + p<sub>0</sub>c<sub>0</sub> | u0, c1 | 1 AND2, 1 OR2 |
+| c<sub>2</sub> | g<sub>1</sub> + p<sub>1</sub>g<sub>0</sub> + p<sub>1</sub>p<sub>0</sub>c<sub>0</sub> | t21, t22, o2, c2 | 2 AND2, 2 OR2 |
+| c<sub>3</sub> | g<sub>2</sub> + p<sub>2</sub>g<sub>1</sub> + p<sub>2</sub>p<sub>1</sub>g<sub>0</sub> + p<sub>2</sub>p<sub>1</sub>p<sub>0</sub>c<sub>0</sub> | t31, t32, t33, o31, o32, c3 | 3 AND2, 3 OR2 |
+| s<sub>i</sub> | p<sub>i</sub> ⊕ c<sub>i</sub> | xs0–2 | 3 XOR = 12 NAND2 |
+| **Total** | | 39 gates | 24 NAND2, 9 AND2, 6 OR2 = 186 transistors |
+
+Partial products are shared: t21 = p1g0 feeds both c2 and t32 = p2·t21, and t22 = p1·u0 feeds
+both c2 and t33 = p2·t22.
 
 ---
 
